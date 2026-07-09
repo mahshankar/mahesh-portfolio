@@ -15,8 +15,10 @@ export default function Navbar() {
                 <ul className="flex gap-8 text-gray-300">
 
                     {navigation.map((item) => (
-                        <li key={item.id} className="hover:text-white cursor-pointer">
+                        <li key={item.id}>
+                         <a href={item.href} className="hover:text-white cursor-pointer">
                             {item.label}
+                           </a>
                         </li>
                     ))}
 

@@ -1,6 +1,6 @@
 type ButtonProps = {
     text: string;
-    variant?: "primary" | "secondary";
+    variant: "primary" | "secondary";
     };
 
 const variants = {

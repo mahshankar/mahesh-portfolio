@@ -3,6 +3,8 @@ export type Project = {
 
     company: string;
 
+    category: string;
+
     project: string;
 
     role: string;
@@ -33,11 +35,13 @@ export const projects = [
 
         company: "Citi",
 
+        category: "Banking/Financial Services",
+
         project: "Olympus Platform",
 
         role: "Principal Engineer",
 
-        duration: "Jan 2025 - Present",
+        duration: "Sep 2025 - Present",
 
         description: "Enterprise reconciliation platform built using microservices and event-driven architecture.",
 
@@ -81,11 +85,13 @@ export const projects = [
 
         company: "Deloitte",
 
+        category: "Consulting/Government",
+
         project: "Illinois IES",
 
         role: "Senior Engineer",
 
-        duration: "Mar 2021 - Dec 2024",
+        duration: "Mar 2021 - Sep 2023",
 
         description: "Modernized eligibility processing platform serving millions of citizens.",
 
@@ -122,11 +128,13 @@ export const projects = [
 
         company: "Florida DEP",
 
+        category: "Government",
+
         project: "ESSA",
 
         role: "Senior Engineer",
 
-        duration: "Mar 2021 - Dec 2024",
+        duration: "Mar 2017 - Dec 2021",
 
         description: "Enterprise authorization platform implementing secure authentication and role-based access.",
 

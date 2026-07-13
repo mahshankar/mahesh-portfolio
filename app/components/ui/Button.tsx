@@ -1,7 +1,8 @@
 type ButtonProps = {
     text: string;
-    variant: "primary" | "secondary";
-    href: string;
+    variant?: "primary" | "secondary";
+    href?: string;
+    onClick?: () => void;
 };
 
 const variants = {
@@ -9,16 +10,20 @@ const variants = {
     secondary: "border border-gray-500 hover:bg-gray-800 text-white",
 };
 
-export default function Button({ text, variant, href }: ButtonProps) {
+export default function Button({ text, variant ="primary", href, onClick }: ButtonProps) {
+    const className =
+            `${variants[variant]} px-6 py-3 rounded-lg transition inline-block`;
+
     if (href) {
         return (
-            <a href={href} className={`${variants[variant]} px-6 py-3 rounded-lg transition inline-block`}>
+            <a href={href} className={className}>
                 {text}
             </a>
         );
     }
+
     return (
-        <button className={`${variants[variant]} px-6 py-3 rounded-lg transition`}>
+        <button className={className} onClick={onClick}>
             {text}
         </button>
     );

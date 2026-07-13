@@ -62,8 +62,19 @@ export default function ProjectCard({
 
             </div>
 
-            {expanded && (
-                <div className="mt-8 border-t border-slate-700 pt-6">
+          <div
+              className={`overflow-hidden
+                  transition-all
+                  duration-500
+                  ease-in-out
+                  ${
+                      expanded
+                          ? "max-h-[1200px] opacity-100 mt-8"
+                          : "max-h-0 opacity-0"
+                  }
+              `}
+          >
+                <div className="border-t border-slate-700 pt-6">
 
                     <h4 className="text-lg font-semibold text-blue-400">
                         Business Problem
@@ -108,11 +119,10 @@ export default function ProjectCard({
 
                 </div>
 
-
-            )}
+        </div>
 
             <button onClick={() => setExpanded(!expanded)} className="mt-8 text-blue-400 hover:text-white transition">
-               {expanded ? "Show Less ↑" : "View Details →"}
+               {expanded ? "▲ Show Less" : "▼ View Details"}
             </button>
 
         </div>

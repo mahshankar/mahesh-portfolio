@@ -4,7 +4,7 @@ import Button from "../ui/Button";
 
 export default function Hero() {
   return (
-    <section className="min-h-screen bg-slate-950 text-white flex items-center">
+    <section id="home" className="min-h-screen bg-slate-950 text-white flex items-center">
       <div className="max-w-6xl mx-auto px-8">
 
         <p className="text-blue-400 text-lg font-semibold">

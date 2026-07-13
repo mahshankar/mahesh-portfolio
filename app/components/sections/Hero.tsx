@@ -26,12 +26,39 @@ export default function Hero() {
         <p className="text-xl text-gray-400 mt-8 max-w-3xl leading-8">
          {profile.description}
         </p>
+        <div className="flex flex-wrap gap-3 mt-8">
+
+            <span className="bg-slate-800 px-4 py-2 rounded-full">
+                Java 17
+            </span>
+
+            <span className="bg-slate-800 px-4 py-2 rounded-full">
+                Spring Boot
+            </span>
+
+            <span className="bg-slate-800 px-4 py-2 rounded-full">
+                Kafka
+            </span>
+
+            <span className="bg-slate-800 px-4 py-2 rounded-full">
+                Kubernetes
+            </span>
+
+            <span className="bg-slate-800 px-4 py-2 rounded-full">
+                AWS
+            </span>
+
+            <span className="bg-slate-800 px-4 py-2 rounded-full">
+                Microservices
+            </span>
+
+        </div>
 
         <div className="mt-10 flex gap-5">
 
-          <Button  text="View Projects" variant="primary" />
+          <Button href="#projects" text="View Projects" variant="primary" />
 
-          <Button text="Download Resume" variant="secondary" />
+          <Button href="resume/Mahesh Shankar-Resume (Java,Spring).docx" text="Download Resume" variant="secondary" />
 
         </div>
 

@@ -6,35 +6,30 @@ export default function Projects() {
     return (
 
         <section
-            id="projects"
-            className="bg-slate-900 text-white py-24"
-        >
+                    id="projects"
+                    className="bg-slate-950 text-white py-24"
+                >
+                    <div className="max-w-6xl mx-auto px-8">
 
-            <div className="max-w-6xl mx-auto px-8">
+                        <h2 className="text-4xl font-bold mb-4">
+                            Featured Projects
+                        </h2>
 
-                <h2 className="text-4xl font-bold">
-                    Featured Projects
-                </h2>
+                        <p className="text-lg text-slate-300 mb-12 max-w-3xl">
+                            A selection of enterprise platforms and modernization initiatives
+                            I've contributed to over the past 19+ years, delivering scalable,
+                            secure, and cloud-ready solutions across financial services,
+                            government, and telecommunications.
+                        </p>
 
-                <p className="text-gray-400 mt-4">
-                    A selection of enterprise platforms I've helped design, modernize, and deliver.
-                </p>
-
-                <div className="grid md:grid-cols-2 gap-8 mt-12">
+                        <div className="grid gap-8">
 
                     {projects.map((project) => (
 
                         <ProjectCard
 
                             key={project.id}
-
-                            title={project.title}
-
-                            client={project.client}
-
-                            description={project.description}
-
-                            technologies={project.technologies}
+                            {...project}
 
                         />
 

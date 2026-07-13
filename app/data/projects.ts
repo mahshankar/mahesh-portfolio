@@ -1,57 +1,181 @@
+export type Project = {
+    id: number;
+
+    company: string;
+
+    project: string;
+
+    role: string;
+
+    duration: string;
+
+    description: string;
+
+    businessProblem: string;
+
+    responsibilities: string[];
+
+    technologies: string[];
+
+    architecture: string[];
+
+    achievements: string[];
+
+};
+
+
+
+
 export const projects = [
 
     {
         id: 1,
 
-        title: "Olympus Platform",
+        company: "Citi",
 
-        client: "Citi",
+        project: "Olympus Platform",
 
-        description:
-            "Enterprise reconciliation platform built using microservices and event-driven architecture.",
+        role: "Principal Engineer",
+
+        duration: "Jan 2025 - Present",
+
+        description: "Enterprise reconciliation platform built using microservices and event-driven architecture.",
+
+        businessProblem: "Designed and modernized an enterprise reconciliation platform capable of processing large-scale financial transactions while improving scalability and resiliency.",
+
+        responsibilities: [
+                "Designed RESTful APIs",
+                "Led microservice development",
+                "Reviewed architecture",
+                "Mentored developers"
+        ],
 
         technologies: [
-            "Java",
-            "Spring Boot",
-            "Kafka",
-            "Kubernetes"
-        ]
+               "Java 17",
+               "Spring Boot",
+               "Kafka",
+               "Kubernetes",
+               "Oracle",
+               "Azure"
+        ],
+
+        architecture: [
+                          "REST APIs",
+                          "Kafka",
+                          "Microservices",
+                          "Oracle",
+                          "Elasticsearch"
+                      ],
+
+        achievements: [
+                          "Modernized legacy applications",
+                          "Improved scalability",
+                          "Reduced manual reconciliation effort",
+                          "Delivered enterprise APIs"
+                      ],
+
     },
 
     {
         id: 2,
 
-        title: "Illinois IES",
+        company: "Deloitte",
 
-        client: "Deloitte",
+        project: "Illinois IES",
 
-        description:
-            "Modernized eligibility processing platform serving millions of citizens.",
+        role: "Senior Engineer",
+
+        duration: "Mar 2021 - Dec 2024",
+
+        description: "Modernized eligibility processing platform serving millions of citizens.",
+
+        businessProblem: "Outdated eligibility processing system leading to delays and errors.",
+
+        responsibilities: [
+            "Developed and maintained microservices using Spring Boot.",
+            "Implemented RESTful APIs for seamless integration.",
+            "Optimized database queries for improved performance."
+        ],
 
         technologies: [
             "Java",
             "Spring Boot",
             "Oracle",
             "REST APIs"
-        ]
+        ],
+
+        architecture: [
+            "Microservices",
+            "API Gateway"
+        ],
+
+        achievements: [
+            "Reduced eligibility processing time by 60%.",
+            "Improved system scalability and reliability."
+        ],
+
     },
 
-    {
+
+{
         id: 3,
 
-        title: "ESSA",
+        company: "Florida DEP",
 
-        client: "Florida DEP",
+        project: "ESSA",
 
-        description:
-            "Enterprise authorization platform implementing secure authentication and role-based access.",
+        role: "Senior Engineer",
+
+        duration: "Mar 2021 - Dec 2024",
+
+        description: "Enterprise authorization platform implementing secure authentication and role-based access.",
+
+        businessProblem: "Outdated eligibility processing system leading to delays and errors.",
+
+        responsibilities: [
+            "Designed and implemented enterprise REST and SOAP services supporting statewide permitting workflows.",
+            "Developed Spring Boot and Java applications for permit processing and business rule execution.",
+            "Integrated multiple enterprise systems using REST APIs, SOAP services, and JMS messaging.",
+            "Collaborated with business analysts and environmental program teams to translate complex regulatory requirements into scalable software solutions.",
+            "Modernized legacy J2EE components and improved maintainability through modular service-oriented architecture.",
+            "Optimized SQL queries and backend processing for high-volume permit transactions.",
+            "Participated in Agile development, production support, code reviews, and release planning."
+        ],
 
         technologies: [
-            "Java",
-            "Spring",
+            "Java 8",
+            "Spring Boot",
+            "Spring MVC",
+            "Hibernate",
+            "JPA",
+            "REST APIs",
+            "SOAP",
             "Oracle",
-            "SOAP"
-        ]
-    }
+            "JMS",
+            "Maven",
+            "Jenkins",
+            "Git",
+            "AWS",
+            "Docker"
+        ],
+
+        architecture: [
+            "Contributed to the modernization of Florida DEP enterprise permitting platform.",
+            "Developed scalable backend services supporting multiple environmental regulatory programs.",
+            "Improved integration between permitting applications and enterprise systems.",
+            "Enhanced maintainability through modular service-oriented design.",
+            "Delivered secure and reliable solutions supporting statewide environmental compliance initiatives."
+        ],
+
+        achievements: [
+            "Contributed to the modernization of Florida DEPs enterprise permitting platform.",
+            "Developed scalable backend services supporting multiple environmental regulatory programs.",
+            "Improved integration between permitting applications and enterprise systems.",
+            "Enhanced maintainability through modular service-oriented design.",
+            "Delivered secure and reliable solutions supporting statewide environmental compliance initiatives."
+        ],
+
+    },
+
 
 ];

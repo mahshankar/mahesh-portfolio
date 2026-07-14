@@ -30,7 +30,17 @@ export default function ProjectCard({
     const [expanded, setExpanded] = useState(false);
     return (
 
-        <div className="bg-slate-800 rounded-xl p-8 hover:bg-slate-700 hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
+        <div className="
+             bg-slate-800
+             rounded-xl
+             p-8
+             hover:bg-slate-700
+             hover:-translate-y-2
+             hover:shadow-2xl
+             hover:shadow-blue-500/10
+             transition-all
+             duration-300
+             ">
 
             <h3 className="text-2xl font-bold text-blue-400">
                 {company}

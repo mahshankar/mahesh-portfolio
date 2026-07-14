@@ -1,8 +1,10 @@
 export const navigation = [
-    { id: "home", label: "Home", href: "#home" },
-    { id: "about", label: "About", href: "#about" },
-    { id: "experience", label: "Experience", href: "#experience" },
-    { id: "skills", label: "Skills", href: "#skills" },
-    { id: "projects", label: "Projects", href: "#projects" },
-    { id: "contact", label: "Contact", href: "#contact" }
+    { id: "home", href: "#home", label: "Home" },
+    { id: "about", href: "#about", label: "About" },
+    { id: "experience", href: "#experience", label: "Experience" },
+    { id: "skills", href: "#skills", label: "Skills" },
+    { id: "projects", href: "#projects", label: "Projects" },
+    { id: "education", href: "#education", label: "Education" },
+    { id: "certifications", href: "#certifications", label: "Certifications" },
+    { id: "contact", href: "#contact", label: "Contact" },
 ];

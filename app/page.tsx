@@ -8,6 +8,7 @@ import Education from "./components/sections/Education";
 import Certification from "./components/sections/Certification";
 import  Contact from "./components/sections/Contact";
 import Footer from "./components/sections/Footer";
+import BackToTop from "./components/ui/BackToTop";
 
 
 export default function Home() {
@@ -23,6 +24,7 @@ export default function Home() {
         <Certification/>
         <Contact/>
         <Footer/>
+        <BackToTop />
     </>
   );
 }

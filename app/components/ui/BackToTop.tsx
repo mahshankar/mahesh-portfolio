@@ -1,21 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useScrollPosition } from "../../hooks/useScrollPosition";
 
 export default function BackToTop() {
 
-    const [showButton, setShowButton] = useState(false);
-    
-    useEffect(() => {
-        const handleScroll = () => {
-            setShowButton(window.scrollY > 400);
-        };
-
-        window.addEventListener("scroll", handleScroll);
-        return () => {
-            window.removeEventListener("scroll", handleScroll);
-        };
-    }, []);
+    const scrollPosition = useScrollPosition();
+    const showButton    = scrollPosition > 400;
 
     const scrollToTop = () => {
         window.scrollTo({

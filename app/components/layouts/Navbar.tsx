@@ -1,39 +1,11 @@
 "use client";
-import {useEffect, useState} from "react";
 import { navigation } from "../../data/navigation";
-import {profile} from "../../data/profile";
+import { profile } from "../../data/profile";
+import { useActiveSection } from "../../hooks/useActiveSection";
 
 export default function Navbar() {
-    const [activeSection, setActiveSection] = useState("about");
-    useEffect(() => {
+    const activeSection = useActiveSection(navigation, "home");
 
-            const handleScroll = () => {
-                let currentSection = "";
-              navigation.forEach((item) => {
-
-                  const section = document.getElementById(item.id);
-
-                  if (!section) return;
-
-                 const top = section.getBoundingClientRect().top;
-
-                 if (top <= 250 ) {
-                     currentSection = item.id;
-                 }
-
-              });
-          setActiveSection(currentSection);
-            };
-
-            handleScroll(); // Call it once to set the initial active section
-            window.addEventListener("scroll", handleScroll);
-
-
-            return () => {
-                window.removeEventListener("scroll", handleScroll);
-            };
-
-        }, []);
 
 
     return (

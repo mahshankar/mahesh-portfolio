@@ -9,6 +9,7 @@ import Certification from "./components/sections/Certification";
 import  Contact from "./components/sections/Contact";
 import Footer from "./components/sections/Footer";
 import BackToTop from "./components/ui/BackToTop";
+import Github from "./components/sections/Github";
 
 
 export default function Home() {
@@ -20,6 +21,7 @@ export default function Home() {
         <Experience/>
         <Skills/>
          <Projects/>
+         <Github/>
         <Education/>
         <Certification/>
         <Contact/>

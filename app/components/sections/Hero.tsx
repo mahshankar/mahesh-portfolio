@@ -58,7 +58,7 @@ export default function Hero() {
 
           <Button href="#projects" text="View Projects" variant="primary" />
 
-          <Button href="resume/Mahesh Shankar-Resume (Java,Spring).docx" text="Download Resume" variant="secondary" />
+          <Button href="/resume/Mahesh Shankar-Resume (Java).pdf" target="_blank" download text="Download Resume" variant="secondary" />
 
         </div>
 

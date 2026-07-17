@@ -20,15 +20,17 @@ export default function ContactForm() {
     const [success, setSuccess] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const field = e.target.name as keyof Contact;
         setContact(prev => ({
             ...prev,
-            [e.target.name]: e.target.value,
+            [field]: e.target.value,
         }));
         // Clear error for this field
-        if (errors[e.target.name]) {
+        const fieldError = field as keyof ContactErrors;
+        if (errors[fieldError]) {
             setErrors(prev => ({
                 ...prev,
-                [e.target.name]: "",
+                [fieldError]: "",
             }));
         }
     };

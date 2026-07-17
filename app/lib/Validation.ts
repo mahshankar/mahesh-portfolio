@@ -1,4 +1,4 @@
-import type {Contact} from "@/components/models/Contact";
+import type {Contact} from "../models/Contact";
 
 export type ContactErrors = {
     name?: string;

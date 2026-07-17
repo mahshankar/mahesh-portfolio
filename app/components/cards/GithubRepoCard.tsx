@@ -3,7 +3,7 @@ type GithubRepoCardProps = {
     description: string;
     url: string;
     stars: number;
-    language: string | null;
+    language?: string | null;
     updatedAt: string;
 };
 

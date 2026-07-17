@@ -10,6 +10,7 @@ import  Contact from "./components/sections/Contact";
 import Footer from "./components/sections/Footer";
 import BackToTop from "./components/ui/BackToTop";
 import Github from "./components/sections/Github";
+import ContactForm from "./components/contact/ContactForm";
 
 
 export default function Home() {

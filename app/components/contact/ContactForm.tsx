@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { validateContactForm } from "../../lib/Validation";
-import { Contact, ContactError } from "../../models/Contact";
+import { Contact, ContactErrors } from "../../models/Contact";
 import TextArea from "../ui/TextArea";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
@@ -15,7 +15,7 @@ export default function ContactForm() {
         message: "",
     });
 
-    const [errors, setErrors] = useState<ContactError>({});
+    const [errors, setErrors] = useState<ContactErrors>({});
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
 

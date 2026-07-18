@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRef } from "react";
 import Button from "../ui/Button";
 import { aiQuestions } from "../../data/aiQuestions";
 
@@ -9,7 +10,10 @@ type ChatMessage = {
     content: string;
 };
 
+
+
 const AIAssistant = () => {
+    const formRef = useRef<HTMLFormElement>(null);
     const [message, setMessage] = useState("");
     //Temporary state to hold the AI assistant's reply
    const [reply, setReply] = useState(`👋 Welcome!
@@ -31,9 +35,7 @@ const AIAssistant = () => {
    const askQuestion = (question: string) => {
       setMessage(question);
       setTimeout(() => {
-          document
-              .getElementById("ask-ai-form")
-              ?.requestSubmit();
+          formRef.current?.requestSubmit();
       }, 100);
   };
 
@@ -245,6 +247,7 @@ const AIAssistant = () => {
             <div className="border-t border-slate-700 p-6">
 
             <form
+            ref={formRef}
             id="ask-ai-form"
                 onSubmit={handleSubmit}
                 className="flex gap-4 items-center"

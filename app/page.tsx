@@ -11,6 +11,7 @@ import Footer from "./components/sections/Footer";
 import BackToTop from "./components/ui/BackToTop";
 import Github from "./components/sections/Github";
 import ContactForm from "./components/contact/ContactForm";
+import AIAssistant from "./components/sections/AIAssistant";
 
 
 export default function Home() {
@@ -18,6 +19,7 @@ export default function Home() {
     <>
       <Navbar />
       <Hero />
+      <AIAssistant/>
         <About />
         <Experience/>
         <Skills/>

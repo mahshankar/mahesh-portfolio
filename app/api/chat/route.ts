@@ -1,10 +1,9 @@
 import OpenAI from "openai";
-import { NextRequest, NextResponse } from "next/server";
 import {portfolioKnowledge} from "@/app/ai/portfolioKnowledge";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+//const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-export async function POST(req: NextRequest) {
+/* export async function POST(req: NextRequest) {
     try {
         // Read request
         const { message } = await req.json();
@@ -18,7 +17,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Call OpenAI
-        const response = await openai.chat.completions.create({
+    const response = await openai.chat.completions.create({
             model: "gpt-4o-mini",
             messages: [
                 {
@@ -48,4 +47,13 @@ export async function POST(req: NextRequest) {
             { status: 500 }
         );
     }
+} */
+
+import { NextResponse } from "next/server";
+
+export async function POST() {
+    return NextResponse.json({
+        reply:
+            "OpenAI integration is temporarily disabled. The portfolio is currently running with a demo AI assistant.",
+    });
 }

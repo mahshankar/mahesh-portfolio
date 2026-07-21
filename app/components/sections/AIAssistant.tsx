@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRef } from "react";
 import Button from "../ui/Button";
 import { aiQuestions } from "../../data/aiQuestions";
+import  {semanticSearch} from "../../api/semanticSearch";
+
 
 type ChatMessage = {
     role: "user" | "assistant";
@@ -54,85 +56,19 @@ const AIAssistant = () => {
             body: JSON.stringify({ message }),
         }); */
 
-    await new Promise(resolve => setTimeout(resolve, 1200));
+    //await new Promise(resolve => setTimeout(resolve, 1200));
 
-        const lower = message.toLowerCase();
+       const matchedDocument = semanticSearch(message);
 
-        let mockReply = "";
+       if (matchedDocument) {
+           setReply(matchedDocument.content);
+       } else {
+           setReply(
+               "Sorry, I couldn't find anything relevant in Mahesh's knowledge base."
+           );
+       }
 
-        if (lower.includes("kafka")) {
-            mockReply = `Mahesh has implemented Kafka-based event-driven microservices across enterprise projects at Citi, Deloitte, and Verizon.
-
-    Highlights:
-
-    • Event-driven architecture
-    • Producer / Consumer patterns
-    • High-throughput messaging
-    • Distributed systems
-    • Spring Kafka integration`;
-        }
-
-        else if (lower.includes("spring")) {
-            mockReply = `Mahesh has over 19 years of Java development experience with extensive use of Spring Boot.
-
-    Key experience:
-
-    • REST APIs
-    • Spring Security
-    • Spring Data JPA
-    • Microservices
-    • Enterprise modernization`;
-        }
-
-        else if (lower.includes("cloud")) {
-            mockReply = `Mahesh has hands-on cloud experience with AWS.
-
-    Technologies include:
-
-    • EC2
-    • S3
-    • IAM
-    • Lambda
-    • Docker
-    • Kubernetes
-    • CI/CD pipelines`;
-        }
-
-        else if (lower.includes("lead")) {
-            mockReply = `Mahesh has led multiple enterprise engineering teams, mentoring developers, conducting architecture reviews, driving Agile delivery, and collaborating with stakeholders across large modernization initiatives.`;
-        }
-
-        else if (lower.includes("ai")) {
-            mockReply = `Mahesh is actively expanding into AI Engineering by building applications with OpenAI APIs, Prompt Engineering, Retrieval-Augmented Generation (RAG), Vector Databases, MCP, AI Agents, and orchestration frameworks. This portfolio is part of that journey.`;
-        }
-
-        else {
-              mockReply = `Mahesh has over 19 years of experience delivering enterprise software solutions.
-
-                  Highlights include:
-
-                  • Java & Spring Boot
-                  • Kafka Event Streaming
-                  • Microservices Architecture
-                  • AWS Cloud
-                  • CI/CD & DevOps
-                  • Technical Leadership
-
-                  Current focus:
-
-                  Building AI-powered applications using OpenAI, Next.js, Retrieval-Augmented Generation (RAG), Vector Databases, MCP, and AI Agents.`;
-            }
-
-      /*  if (!response.ok) {
-            setReply("Error: Unable to get a response from the AI assistant.");
-
-            return;
-        }
-    const data = await response.json();
-            setReply(data.reply); */
-
-            setReply(mockReply);
-            setMessage ("");
+       setMessage("")
 
 
     }catch (error) {
@@ -169,7 +105,7 @@ const AIAssistant = () => {
                 </span>
 
                 <span className="px-3 py-1 rounded-full bg-green-600/20 text-green-300">
-                    OpenAI SDK
+                    AI Retrieval/OpenAI SDK
                 </span>
 
                 <span className="px-3 py-1 rounded-full bg-purple-600/20 text-purple-300">
@@ -257,6 +193,7 @@ const AIAssistant = () => {
                     type="text"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
+                    autoComplete="off"
                    placeholder="Ask me about Java, Kafka, AWS, AI, Leadership..."
                       className="flex-1 rounded-xl bg-slate-800 border border-slate-700 px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />

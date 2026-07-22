@@ -3,6 +3,8 @@ export type PortfolioDocument = {
     title: string;
     tags: string[];
     content: string;
+     type?: "skill" | "project" | "profile";
+     priority?: number;
 };
 
 
@@ -20,6 +22,7 @@ export const documents: PortfolioDocument[] = [
         "experience",
         "career"
     ],
+    type: "profile",
 
     content:
               "Mahesh Shankar is a Senior Software Engineer with over 19 years of experience designing and delivering enterprise software solutions. He specializes in backend engineering, enterprise architecture, technical leadership, and modernization of large-scale systems."
@@ -38,6 +41,7 @@ export const documents: PortfolioDocument[] = [
         "spring"
     ],
 
+    type: "skill",
     content:
         "Mahesh has over 19 years of Java development experience building enterprise applications using Java, Spring Framework, Spring Boot, REST APIs, JPA, Hibernate, and distributed architectures."
 },
@@ -54,6 +58,7 @@ export const documents: PortfolioDocument[] = [
         "rest"
     ],
 
+    type: "skill",
     content:
         "Mahesh has designed and developed enterprise microservices using Spring Boot, REST APIs, Docker, Kubernetes, Kafka, and cloud-native design principles."
 },
@@ -72,6 +77,7 @@ export const documents: PortfolioDocument[] = [
         "events"
     ],
 
+    type: "skill",
     content:
         "Mahesh has implemented Kafka-based event-driven architectures, asynchronous messaging, producer-consumer systems, and enterprise event streaming across large-scale applications."
 },
@@ -84,12 +90,20 @@ export const documents: PortfolioDocument[] = [
     tags: [
         "aws",
         "cloud",
+        "cloud migration",
+        "modernization",
+        "modernize",
+        "application modernization",
         "docker",
         "kubernetes",
+        "containers",
         "ec2",
-        "s3"
-    ],
+        "s3",
+        "ci/cd",
+        "deployment"
+     ],
 
+    type: "skill",
     content:
         "Mahesh has experience deploying enterprise applications using AWS services including EC2, S3, IAM, Docker containers, Kubernetes orchestration, and CI/CD pipelines."
 },
@@ -106,6 +120,7 @@ export const documents: PortfolioDocument[] = [
         "team"
     ],
 
+    type: "skill",
     content:
         "Mahesh has led enterprise engineering teams, mentored developers, conducted architecture reviews, collaborated with business stakeholders, and driven Agile software delivery."
 },
@@ -130,7 +145,7 @@ export const documents: PortfolioDocument[] = [
         "mcp",
         "prompt engineering"
     ],
-
+    type: "skill",
     content:
         "Mahesh is actively expanding into Artificial Intelligence and Generative AI Engineering by building applications using Next.js, OpenAI APIs, Prompt Engineering, Retrieval-Augmented Generation (RAG), Embeddings, Vector Databases, MCP, Tool Calling, and AI Agents."
 },
@@ -140,41 +155,52 @@ export const documents: PortfolioDocument[] = [
 
     title: "Projects",
 
-    tags: [
-        "projects",
-        "citi",
-        "deloitte",
-        "verizon",
-        "government"
+    tags:[
+     "modernization",
+     "legacy modernization",
+     "cloud migration",
+     "application modernization",
+     "java",
+     "spring boot",
+     "kubernetes"
     ],
-
+    type: "project",
     content:
         "Mahesh has delivered enterprise software solutions for Citi, Deloitte, Verizon, and multiple state government agencies, modernizing legacy systems into cloud-native architectures."
 },
 {
  id: "citi",
  title: "Citi Banking Experience",
- tags:[
-   "citi",
-   "banking",
-   "reconciliation",
-   "microservices",
-   "kafka",
-   "java"
+ tags: [
+     "citi",
+     "banking",
+     "java",
+     "spring",
+     "spring boot",
+     "microservices",
+     "kafka",
+     "reconciliation",
+     "enterprise",
+     "project"
  ],
+ type: "project",
  content:
  "Mahesh is currently working as a Senior Solution Specialist on Citi enterprise platforms. He designs Java Spring Boot microservices, builds reconciliation frameworks, works with Kafka, Elasticsearch, GemFire, Cloudera observability, and enterprise CI/CD pipelines."
 },
 {
  id:"deloitte",
  title:"Deloitte Enterprise Modernization",
- tags:[
-   "deloitte",
-   "modernization",
-   "government",
-   "spring boot",
-   "kubernetes"
+ tags: [
+     "deloitte",
+     "java",
+     "spring",
+     "spring boot",
+     "microservices",
+     "modernization",
+     "kubernetes",
+     "cloud"
  ],
+ type: "project",
  content:
  "At Deloitte, Mahesh contributed to large-scale government modernization initiatives including decentralized identity platforms and eligibility systems. He worked with Java, Spring Boot, Kafka, Docker, Kubernetes, Azure, Google Cloud, and legacy modernization."
 },
@@ -187,6 +213,7 @@ export const documents: PortfolioDocument[] = [
    "websphere",
    "db2"
  ],
+ type: "project",
  content:
  "Mahesh has experience modernizing legacy enterprise systems by migrating mainframe and WebSphere based applications into Java Spring Boot microservices, cloud-native architectures, and containerized deployments."
 },
@@ -200,6 +227,7 @@ export const documents: PortfolioDocument[] = [
    "gke",
    "containers"
  ],
+ type: "skill",
  content:
  "Mahesh has containerized enterprise applications using Docker and deployed workloads using Kubernetes platforms including Azure Kubernetes Service and Google Kubernetes Engine. He has experience with deployments, scaling, and cloud-native application patterns."
 },
@@ -213,6 +241,7 @@ export const documents: PortfolioDocument[] = [
    "pipeline",
    "devops"
  ],
+ type: "skill",
  content:
  "Mahesh has implemented enterprise CI/CD pipelines using Jenkins, Bamboo, Harness, Maven, GitHub, SonarQube, Snyk, and automated quality/security checks."
 },
@@ -225,6 +254,7 @@ export const documents: PortfolioDocument[] = [
    "frontend",
    "full stack"
  ],
+ type: "skill",
  content:
  "Mahesh has full-stack development experience building enterprise applications using React, Angular, Java Spring Boot APIs, REST services, and modern web technologies."
 },
@@ -237,6 +267,7 @@ export const documents: PortfolioDocument[] = [
    "semantic search",
    "rag"
  ],
+ type: "skill",
  content:
  "Mahesh is building an AI-powered portfolio assistant using Next.js, TypeScript, semantic search, knowledge documents, retrieval concepts, and RAG architecture patterns to demonstrate practical AI engineering skills."
 }

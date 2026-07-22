@@ -1,86 +1,80 @@
 "use client";
 
 import { useState } from "react";
-import { useRef } from "react";
+import type { FormEvent } from "react";
+
 import Button from "../ui/Button";
 import { aiQuestions } from "../../data/aiQuestions";
-import  {semanticSearch} from "../../api/semanticSearch";
+import { semanticSearch } from "../../ai/semanticSearch";
+import { generateAIResponse } from "../../ai/answerEngine";
 
+const INITIAL_REPLY = `👋 Welcome!
 
-type ChatMessage = {
-    role: "user" | "assistant";
-    content: string;
-};
+I'm Mahesh's AI Career Assistant.
 
+I can answer questions about:
 
+• 19+ years of Java experience
+• Spring Boot & Microservices
+• Kafka Event Streaming
+• AWS Cloud
+• Enterprise Architecture
+• Technical Leadership
+• Current AI Engineering Journey
+
+Try one of the suggested questions below or ask anything about Mahesh's experience.`;
 
 const AIAssistant = () => {
-    const formRef = useRef<HTMLFormElement>(null);
+
     const [message, setMessage] = useState("");
+    const [lastQuestion, setLastQuestion] = useState("");
     //Temporary state to hold the AI assistant's reply
-   const [reply, setReply] = useState(`👋 Welcome!
-
-   I'm Mahesh's AI Career Assistant.
-
-   I can answer questions about:
-
-   • 19+ years of Java experience
-   • Spring Boot & Microservices
-   • Kafka Event Streaming
-   • AWS Cloud
-   • Enterprise Architecture
-   • Technical Leadership
-   • Current AI Engineering Journey
-
-   Try one of the suggested questions below or ask anything about Mahesh's experience.`);
+   const [reply, setReply] = useState(INITIAL_REPLY);
     const [loading, setLoading] = useState(false);
-   const askQuestion = (question: string) => {
-      setMessage(question);
-      setTimeout(() => {
-          formRef.current?.requestSubmit();
-      }, 100);
-  };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if(!message.trim()) {
+    const processQuestion = (question: string) => {
+        const trimmedQuestion = question.trim();
+
+        if (!trimmedQuestion || loading) {
             return;
         }
+
         setLoading(true);
-      try{
-        /* const response = await fetch("/api/chat", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ message }),
-        }); */
+         setLastQuestion(trimmedQuestion);
 
-    //await new Promise(resolve => setTimeout(resolve, 1200));
+        try {
+            const matchedDocuments = semanticSearch(trimmedQuestion);
 
-       const matchedDocument = semanticSearch(message);
+            const generatedResponse = generateAIResponse(
+                trimmedQuestion,
+                matchedDocuments
+            );
 
-       if (matchedDocument) {
-           setReply(matchedDocument.content);
-       } else {
-           setReply(
-               "Sorry, I couldn't find anything relevant in Mahesh's knowledge base."
-           );
-       }
+            setReply(generatedResponse);
+            setMessage("");
+        } catch (error) {
+            console.error("AI SEARCH ERROR:", error);
 
-       setMessage("")
-
-
-    }catch (error) {
-            setReply("Error: Unable to get a response from the AI assistant.");
-
-            return;
-        }finally {
+            setReply(
+                "Sorry, the assistant encountered an error while searching Mahesh's knowledge base."
+            );
+        } finally {
             setLoading(false);
         }
-
     };
 
+
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+
+        e.preventDefault();
+
+        processQuestion(message);
+    };
+
+ const askQuestion = (question: string) => {
+      setMessage(question);
+      processQuestion(question);
+  };
     return (
         <section
             id="ai"
@@ -157,18 +151,30 @@ const AIAssistant = () => {
                     </h3>
 
                     <p className="text-sm text-slate-400">
-                        Powered by OpenAI
+                        No API • No LLM • Local Knowledge Base
                     </p>
 
                 </div>
 
             </div>
 
-            <p className="whitespace-pre-wrap leading-8 text-slate-200">
+           <div aria-live="polite">
+               {lastQuestion && (
+                   <div className="mb-6 rounded-xl border border-blue-500/30 bg-blue-500/10 p-4">
+                       <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-blue-300">
+                           You asked
+                       </p>
 
-                {reply}
+                       <p className="text-white">
+                           {lastQuestion}
+                       </p>
+                   </div>
+               )}
 
-            </p>
+               <p className="whitespace-pre-wrap leading-8 text-slate-200">
+                   {reply}
+               </p>
+           </div>
 
         </div>
         {loading && (
@@ -183,7 +189,6 @@ const AIAssistant = () => {
             <div className="border-t border-slate-700 p-6">
 
             <form
-            ref={formRef}
             id="ask-ai-form"
                 onSubmit={handleSubmit}
                 className="flex gap-4 items-center"
@@ -193,6 +198,7 @@ const AIAssistant = () => {
                     type="text"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
+                    aria-label="Ask AI about Mahesh's experience"
                     autoComplete="off"
                    placeholder="Ask me about Java, Kafka, AWS, AI, Leadership..."
                       className="flex-1 rounded-xl bg-slate-800 border border-slate-700 px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"

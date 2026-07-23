@@ -7,6 +7,12 @@ import Button from "../ui/Button";
 import { aiQuestions } from "../../data/aiQuestions";
 import { semanticSearch } from "../../ai/semanticSearch";
 import { generateAIResponse } from "../../ai/answerEngine";
+import {
+    generateEmbedding,
+    getEmbeddingModelName,
+} from "../../ai/embeddingModel";
+import { calculateCosineSimilarity } from "../../ai/cosineSimilarity";
+import { vectorSearchWithScores } from "../../ai/vectorSearch";
 
 const INITIAL_REPLY = `👋 Welcome!
 
@@ -32,7 +38,7 @@ const AIAssistant = () => {
    const [reply, setReply] = useState(INITIAL_REPLY);
     const [loading, setLoading] = useState(false);
 
-    const processQuestion = (question: string) => {
+    const processQuestion = async (question: string) => {
         const trimmedQuestion = question.trim();
 
         if (!trimmedQuestion || loading) {
@@ -43,6 +49,16 @@ const AIAssistant = () => {
          setLastQuestion(trimmedQuestion);
 
         try {
+            const vectorResults =
+                await vectorSearchWithScores(trimmedQuestion);
+
+            console.log(
+                "Vector search matches:",
+                vectorResults.map(({ document, score }) => ({
+                    title: document.title,
+                    score,
+                }))
+            );
             const matchedDocuments = semanticSearch(trimmedQuestion);
 
             const generatedResponse = generateAIResponse(
@@ -64,16 +80,16 @@ const AIAssistant = () => {
     };
 
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit =  (e: FormEvent<HTMLFormElement>) => {
 
         e.preventDefault();
 
-        processQuestion(message);
+       void processQuestion(message);
     };
 
  const askQuestion = (question: string) => {
       setMessage(question);
-      processQuestion(question);
+      void processQuestion(question);
   };
     return (
         <section

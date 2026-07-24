@@ -11,11 +11,13 @@ export const DEFAULT_MAX_KEYWORD_RESULTS = 5;
 export type KeywordSearchResult = {
     document: PortfolioDocument;
     score: number;
+
 };
 
 export type KeywordSearchOptions = {
     minScore?: number;
     maxResults?: number;
+    debug?:boolean;
 };
 
 export function keywordSearchWithScores(
@@ -45,14 +47,14 @@ export function keywordSearchWithScores(
             ),
         }))
         .sort((a, b) => b.score - a.score);
-
-    console.table(
-        rankedDocuments.map(({ document, score }) => ({
-            title: document.title,
-            keywordScore: score,
-        }))
-    );
-
+    if (options.debug) {
+        console.table(
+            rankedDocuments.map(({ document, score }) => ({
+                title: document.title,
+                keywordScore: score,
+            }))
+        );
+    }
     return rankedDocuments
         .filter(({ score }) => score >= minScore)
         .slice(0, maxResults);

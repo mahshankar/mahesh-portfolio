@@ -144,6 +144,33 @@ export function combineHybridResults(
 
     return combinedResults;
 }
+export function hasSufficientHybridEvidence(
+    keywordResults: KeywordSearchResult[],
+    vectorResults: VectorSearchResult[]
+): boolean {
+    const highestKeywordScore = Math.max(
+        0,
+        ...keywordResults.map(({ score }) => score)
+    );
+
+    const highestVectorScore = Math.max(
+        0,
+        ...vectorResults.map(({ score }) => score)
+    );
+
+    const hasMeaningfulKeywordSignal =
+        highestKeywordScore >=
+        DEFAULT_MIN_KEYWORD_SCORE;
+
+    const hasMeaningfulVectorSignal =
+        highestVectorScore >=
+        MIN_STRONG_VECTOR_SCORE;
+
+    return (
+        hasMeaningfulKeywordSignal ||
+        hasMeaningfulVectorSignal
+    );
+}
 
 export async function hybridSearchWithScores(
     question: string
@@ -154,83 +181,69 @@ export async function hybridSearchWithScores(
         return [];
     }
 
-    /*
-     * Retrieve every document score before combining.
-     */
+    // 1. Generate keyword results first.
     const keywordResults =
         keywordSearchWithScores(
             normalizedQuestion,
             {
                 minScore: 0,
                 maxResults: documents.length,
+                debug: false,
             }
         );
 
+    // 2. Generate vector results.
     const vectorResults =
         await vectorSearchWithScores(
             normalizedQuestion,
             {
                 minSimilarity: -1,
                 maxResults: documents.length,
+                debug: false,
             }
         );
-    const highestKeywordScore =
-        keywordResults[0]?.score ?? 0;
 
-    const highestVectorScore =
-        vectorResults[0]?.score ?? 0;
-
-    const hasMeaningfulKeywordSignal =
-        highestKeywordScore >=
-        DEFAULT_MIN_KEYWORD_SCORE;
-
-    const hasMeaningfulVectorSignal =
-        highestVectorScore >=
-        MIN_STRONG_VECTOR_SCORE;
-
-    /*
-     * Reject questions that have neither a meaningful
-     * keyword match nor a sufficiently strong semantic match.
-     */
+    // 3. Check whether either retrieval method
+    // found enough evidence.
     if (
-        !hasMeaningfulKeywordSignal &&
-        !hasMeaningfulVectorSignal
+        !hasSufficientHybridEvidence(
+            keywordResults,
+            vectorResults
+        )
     ) {
-        console.info(
-            "Hybrid search rejected an out-of-domain query:",
-            {
-                question: normalizedQuestion,
-                highestKeywordScore,
-                highestVectorScore,
-            }
-        );
+        if (process.env.NODE_ENV === "development") {
+            console.info(
+                "Hybrid search rejected an out-of-domain query:",
+                normalizedQuestion
+            );
+        }
 
         return [];
     }
+
+    // 4. Combine the keyword and vector scores.
     const hybridResults = combineHybridResults(
         normalizedQuestion,
         keywordResults,
         vectorResults
     );
-if (process.env.NODE_ENV === "development") {
-    console.table(
-        hybridResults.map((result) => ({
-            title: result.document.title,
 
-            keyword: Number(
-                result.normalizedKeywordScore.toFixed(4)
-            ),
-
-            vector: Number(
-                result.normalizedVectorScore.toFixed(4)
-            ),
-
-            hybrid: Number(
-                result.hybridScore.toFixed(4)
-            ),
-        }))
-    );
-}
+    if (process.env.NODE_ENV === "development") {
+        console.table(
+            hybridResults.map((result) => ({
+                title: result.document.title,
+                keyword: Number(
+                    result.normalizedKeywordScore.toFixed(4)
+                ),
+                vector: Number(
+                    result.normalizedVectorScore.toFixed(4)
+                ),
+                hybrid: Number(
+                    result.hybridScore.toFixed(4)
+                ),
+            }))
+        );
+    }
 
     return hybridResults;
 }

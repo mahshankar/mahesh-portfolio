@@ -23,6 +23,7 @@ export type VectorSearchResult = {
 export type VectorSearchOptions = {
     minSimilarity?: number;
     maxResults?: number;
+    debug?:boolean;
 };
 
 export async function vectorSearchWithScores(
@@ -68,7 +69,7 @@ export async function vectorSearchWithScores(
         .sort((a, b) => b.score - a.score);
 
 
-        if (process.env.NODE_ENV === "development") {
+        if (options.debug) {
             console.table(
                 rankedDocuments.map(({ document, score }) => ({
                     title: document.title,

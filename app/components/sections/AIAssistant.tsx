@@ -15,6 +15,7 @@ import { calculateCosineSimilarity } from "../../ai/cosineSimilarity";
 import { vectorSearchWithScores } from "../../ai/vectorSearch";
 import {hybridSearchWithScores} from "../../ai/hybridSearch";
 
+
 const INITIAL_REPLY = `👋 Welcome!
 
 I'm Mahesh's AI Career Assistant.
@@ -38,6 +39,7 @@ const AIAssistant = () => {
     //Temporary state to hold the AI assistant's reply
    const [reply, setReply] = useState(INITIAL_REPLY);
     const [loading, setLoading] = useState(false);
+    const [evaluating, setEvaluating] = useState(false);
 
     const processQuestion = async (question: string) => {
         const trimmedQuestion = question.trim();
@@ -77,6 +79,32 @@ const AIAssistant = () => {
         }
     };
 
+    const handleRunEvaluation = async () => {
+        if (process.env.NODE_ENV !== "development" || evaluating) {
+            return;
+        }
+
+        setEvaluating(true);
+
+        try {
+            const { runRetrievalEvaluation } =
+                        await import("../../ai/retrievalEvaluator");
+            const report =
+                await runRetrievalEvaluation();
+
+            console.log(
+                "Full retrieval evaluation report:",
+                report
+            );
+        } catch (error) {
+            console.error(
+                "RETRIEVAL EVALUATION ERROR:",
+                error
+            );
+        } finally {
+            setEvaluating(false);
+        }
+    };
 
     const handleSubmit =  (e: FormEvent<HTMLFormElement>) => {
 
@@ -146,6 +174,21 @@ const AIAssistant = () => {
             ))}
 
             </div>
+
+            {process.env.NODE_ENV === "development" && (
+                <button
+                    type="button"
+                    onClick={() => {
+                        void handleRunEvaluation();
+                    }}
+                    disabled={evaluating}
+                    className="mt-4 rounded-lg border border-slate-600 px-4 py-2 text-sm text-slate-300 transition hover:bg-slate-800 disabled:opacity-50"
+                >
+                    {evaluating
+                        ? "Running evaluation..."
+                        : "Run retrieval evaluation"}
+                </button>
+            )}
 
             </div>
 

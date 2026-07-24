@@ -12,17 +12,19 @@ export type RetrievalEvaluationCase = {
     question: string;
 
     /*
-     * These titles represent documents that would be
-     * considered relevant for this question.
-     *
-     * The evaluator does not require every title to appear.
-     * It checks whether the ranking contains relevant
-     * evidence in Top 1 and Top 3.
+     * The single best document that should rank first.
+     * It is omitted for out-of-domain questions.
      */
-    expectedTitles: string[];
+    primaryExpectedTitle?: string;
 
     /*
-     * True when retrieval should return no documents.
+     * All documents considered relevant to the question,
+     * including the primary result and supporting results.
+     */
+    relevantTitles: string[];
+
+    /*
+     * True when no portfolio document should be returned.
      */
     expectNoResults?: boolean;
 };
@@ -34,7 +36,9 @@ export const evaluationQuestions:
             category: "exact-match",
             question:
                 "How did Mahesh use Kafka at Citi?",
-            expectedTitles: [
+            primaryExpectedTitle:
+                "Citi Banking Experience",
+            relevantTitles: [
                 "Citi Banking Experience",
                 "Kafka",
                 "Microservices",
@@ -45,7 +49,9 @@ export const evaluationQuestions:
             category: "semantic-paraphrase",
             question:
                 "Describe Mahesh's event-streaming work for the banking client.",
-            expectedTitles: [
+            primaryExpectedTitle:
+                "Citi Banking Experience",
+            relevantTitles: [
                 "Citi Banking Experience",
                 "Kafka",
                 "Microservices",
@@ -56,7 +62,9 @@ export const evaluationQuestions:
             category: "semantic-paraphrase",
             question:
                 "What experience does Mahesh have modernizing old enterprise applications?",
-            expectedTitles: [
+            primaryExpectedTitle:
+                "Legacy System Modernization",
+            relevantTitles: [
                 "Legacy System Modernization",
                 "Deloitte Enterprise Modernization",
                 "Java",
@@ -67,7 +75,9 @@ export const evaluationQuestions:
             category: "company-context",
             question:
                 "How did Mahesh use Spring Boot at Deloitte?",
-            expectedTitles: [
+            primaryExpectedTitle:
+                "Deloitte Enterprise Modernization",
+            relevantTitles: [
                 "Deloitte Enterprise Modernization",
                 "Legacy System Modernization",
                 "Java",
@@ -78,7 +88,8 @@ export const evaluationQuestions:
             category: "skill",
             question:
                 "What Kafka experience does Mahesh have?",
-            expectedTitles: [
+            primaryExpectedTitle: "Kafka",
+            relevantTitles: [
                 "Kafka",
                 "Citi Banking Experience",
                 "Microservices",
@@ -89,7 +100,8 @@ export const evaluationQuestions:
             category: "skill",
             question:
                 "What experience does Mahesh have designing distributed services?",
-            expectedTitles: [
+            primaryExpectedTitle: "Microservices",
+            relevantTitles: [
                 "Microservices",
                 "Java",
                 "Citi Banking Experience",
@@ -100,7 +112,8 @@ export const evaluationQuestions:
             category: "skill",
             question:
                 "What cloud and container technologies has Mahesh used?",
-            expectedTitles: [
+            primaryExpectedTitle: "Cloud",
+            relevantTitles: [
                 "Cloud",
                 "Containerization and Kubernetes",
                 "CI/CD and DevOps",
@@ -111,7 +124,8 @@ export const evaluationQuestions:
             category: "skill",
             question:
                 "Describe Mahesh's technical leadership experience.",
-            expectedTitles: [
+            primaryExpectedTitle: "Leadership",
+            relevantTitles: [
                 "Leadership",
             ],
         },
@@ -120,7 +134,8 @@ export const evaluationQuestions:
             category: "skill",
             question:
                 "What AI engineering work has Mahesh completed?",
-            expectedTitles: [
+            primaryExpectedTitle: "AI Engineering",
+            relevantTitles: [
                 "AI Engineering",
                 "AI Portfolio Assistant",
             ],
@@ -130,7 +145,8 @@ export const evaluationQuestions:
             category: "project",
             question:
                 "Tell me about Mahesh's enterprise projects.",
-            expectedTitles: [
+            primaryExpectedTitle: "Projects",
+            relevantTitles: [
                 "Projects",
                 "Citi Banking Experience",
                 "Deloitte Enterprise Modernization",
@@ -141,7 +157,7 @@ export const evaluationQuestions:
             category: "out-of-domain",
             question:
                 "What experience does Mahesh have in marine biology?",
-            expectedTitles: [],
+            relevantTitles: [],
             expectNoResults: true,
         },
     ];

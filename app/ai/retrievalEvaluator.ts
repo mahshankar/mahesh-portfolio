@@ -29,11 +29,38 @@ export type RetrievalMode =
 
 export type RankingEvaluation = {
     resultTitles: string[];
-    top1Hit: boolean;
-    top3Hit: boolean;
-    firstRelevantRank: number | null;
-    reciprocalRank: number;
+
+    /*
+     * Did the ideal primary document rank first?
+     */
+    strictTop1Hit: boolean;
+
+    /*
+     * Did the ideal primary document appear in Top 3?
+     */
+    primaryTop3Hit: boolean;
+
+    /*
+     * Did any relevant document appear in Top 3?
+     */
+    top3RelevantHit: boolean;
+
+    /*
+     * Position of the primary expected document.
+     */
+    primaryRank: number | null;
+
+    /*
+     * Reciprocal rank of the primary document.
+     */
+    primaryReciprocalRank: number;
+
+    /*
+     * Percentage of expected relevant documents
+     * found within Top 3.
+     */
     coverageAt3: number;
+
     correctRejection: boolean;
     passed: boolean;
 };
@@ -42,7 +69,9 @@ export type EvaluationCaseResult = {
     id: string;
     category: string;
     question: string;
-    expectedTitles: string[];
+
+    primaryExpectedTitle?: string;
+    relevantTitles: string[];
     expectNoResults: boolean;
 
     keyword: RankingEvaluation;
@@ -52,13 +81,18 @@ export type EvaluationCaseResult = {
 
 export type RetrievalModeSummary = {
     mode: RetrievalMode;
+
     inDomainCases: number;
     outOfDomainCases: number;
-    top1Accuracy: number;
-    top3Accuracy: number;
-    meanReciprocalRank: number;
+
+    strictTop1Accuracy: number;
+    primaryTop3Accuracy: number;
+    top3RelevantAccuracy: number;
+
+    meanPrimaryReciprocalRank: number;
     averageCoverageAt3: number;
     rejectionAccuracy: number;
+
     passedCases: number;
     totalCases: number;
 };
@@ -77,8 +111,8 @@ export async function runRetrievalEvaluation():
         EvaluationCaseResult[] = [];
 
     /*
-     * Run sequentially so the local transformer model
-     * does not process many embedding requests at once.
+     * Run sequentially to avoid sending many simultaneous
+     * requests through the local embedding model.
      */
     for (const evaluationCase of evaluationQuestions) {
         const keywordAll =
@@ -102,8 +136,7 @@ export async function runRetrievalEvaluation():
             );
 
         /*
-         * Apply the same thresholds used by the normal
-         * keyword and vector search modes.
+         * Apply normal keyword retrieval thresholds.
          */
         const keywordResults = keywordAll
             .filter(
@@ -113,6 +146,9 @@ export async function runRetrievalEvaluation():
             )
             .slice(0, MAX_EVALUATION_RESULTS);
 
+        /*
+         * Apply normal vector retrieval thresholds.
+         */
         const vectorResults = vectorAll
             .filter(
                 ({ score }) =>
@@ -122,8 +158,8 @@ export async function runRetrievalEvaluation():
             .slice(0, MAX_EVALUATION_RESULTS);
 
         /*
-         * Reuse the already generated keyword and vector
-         * scores rather than embedding this question again.
+         * Reuse existing keyword and vector scores so the
+         * question does not need to be embedded again.
          */
         const hybridResults =
             hasSufficientHybridEvidence(
@@ -142,8 +178,13 @@ export async function runRetrievalEvaluation():
             id: evaluationCase.id,
             category: evaluationCase.category,
             question: evaluationCase.question,
-            expectedTitles:
-                evaluationCase.expectedTitles,
+
+            primaryExpectedTitle:
+                evaluationCase.primaryExpectedTitle,
+
+            relevantTitles:
+                evaluationCase.relevantTitles,
+
             expectNoResults:
                 evaluationCase.expectNoResults ??
                 false,
@@ -203,41 +244,61 @@ function evaluateRanking(
     const expectNoResults =
         evaluationCase.expectNoResults ?? false;
 
+    /*
+     * Out-of-domain evaluation.
+     */
     if (expectNoResults) {
         const correctRejection =
             resultTitles.length === 0;
 
         return {
             resultTitles,
-            top1Hit: false,
-            top3Hit: false,
-            firstRelevantRank: null,
-            reciprocalRank: 0,
+            strictTop1Hit: false,
+            primaryTop3Hit: false,
+            top3RelevantHit: false,
+            primaryRank: null,
+            primaryReciprocalRank: 0,
             coverageAt3: 0,
             correctRejection,
             passed: correctRejection,
         };
     }
 
-    const expectedTitles = new Set(
-        evaluationCase.expectedTitles
-    );
+    const primaryExpectedTitle =
+        evaluationCase.primaryExpectedTitle;
 
-    const firstRelevantIndex =
-        resultTitles.findIndex((title) =>
-            expectedTitles.has(title)
+    if (!primaryExpectedTitle) {
+        throw new Error(
+            `Evaluation case "${evaluationCase.id}" is missing primaryExpectedTitle.`
+        );
+    }
+
+    /*
+     * Ensure the primary document is also considered
+     * part of the relevant-document set.
+     */
+    const relevantTitles = new Set([
+        primaryExpectedTitle,
+        ...evaluationCase.relevantTitles,
+    ]);
+
+    const primaryIndex =
+        resultTitles.indexOf(
+            primaryExpectedTitle
         );
 
-    const firstRelevantRank =
-        firstRelevantIndex >= 0
-            ? firstRelevantIndex + 1
+    const primaryRank =
+        primaryIndex >= 0
+            ? primaryIndex + 1
             : null;
 
-    const top1Title = resultTitles[0];
+    const strictTop1Hit =
+        resultTitles[0] ===
+        primaryExpectedTitle;
 
-    const top1Hit =
-        Boolean(top1Title) &&
-        expectedTitles.has(top1Title);
+    const primaryTop3Hit =
+        primaryRank !== null &&
+        primaryRank <= 3;
 
     const top3Titles =
         resultTitles.slice(0, 3);
@@ -245,16 +306,16 @@ function evaluateRanking(
     const relevantTop3Titles =
         new Set(
             top3Titles.filter((title) =>
-                expectedTitles.has(title)
+                relevantTitles.has(title)
             )
         );
 
-    const top3Hit =
+    const top3RelevantHit =
         relevantTop3Titles.size > 0;
 
     const maximumPossibleCoverage =
         Math.min(
-            evaluationCase.expectedTitles.length,
+            relevantTitles.size,
             3
         );
 
@@ -264,25 +325,26 @@ function evaluateRanking(
               maximumPossibleCoverage
             : 0;
 
-    const reciprocalRank =
-        firstRelevantRank
-            ? 1 / firstRelevantRank
+    const primaryReciprocalRank =
+        primaryRank
+            ? 1 / primaryRank
             : 0;
 
     return {
         resultTitles,
-        top1Hit,
-        top3Hit,
-        firstRelevantRank,
-        reciprocalRank,
+        strictTop1Hit,
+        primaryTop3Hit,
+        top3RelevantHit,
+        primaryRank,
+        primaryReciprocalRank,
         coverageAt3,
         correctRejection: false,
 
         /*
-         * For an in-domain question, the case passes when
-         * a relevant document appears in the Top 3.
+         * Sprint 25.1 uses strict Top-1 as the pass
+         * requirement for an in-domain case.
          */
-        passed: top3Hit,
+        passed: strictTop1Hit,
     };
 }
 
@@ -300,7 +362,7 @@ function summarizeMode(
             (result) => result.expectNoResults
         );
 
-    const modeResults =
+    const inDomainModeResults =
         inDomainCases.map(
             (result) => result[mode]
         );
@@ -310,31 +372,47 @@ function summarizeMode(
             (result) => result[mode]
         );
 
-    const top1Accuracy =
+    const strictTop1Accuracy =
         calculateAverage(
-            modeResults.map((result) =>
-                result.top1Hit ? 1 : 0
-            )
-        );
-
-    const top3Accuracy =
-        calculateAverage(
-            modeResults.map((result) =>
-                result.top3Hit ? 1 : 0
-            )
-        );
-
-    const meanReciprocalRank =
-        calculateAverage(
-            modeResults.map(
+            inDomainModeResults.map(
                 (result) =>
-                    result.reciprocalRank
+                    result.strictTop1Hit
+                        ? 1
+                        : 0
+            )
+        );
+
+    const primaryTop3Accuracy =
+        calculateAverage(
+            inDomainModeResults.map(
+                (result) =>
+                    result.primaryTop3Hit
+                        ? 1
+                        : 0
+            )
+        );
+
+    const top3RelevantAccuracy =
+        calculateAverage(
+            inDomainModeResults.map(
+                (result) =>
+                    result.top3RelevantHit
+                        ? 1
+                        : 0
+            )
+        );
+
+    const meanPrimaryReciprocalRank =
+        calculateAverage(
+            inDomainModeResults.map(
+                (result) =>
+                    result.primaryReciprocalRank
             )
         );
 
     const averageCoverageAt3 =
         calculateAverage(
-            modeResults.map(
+            inDomainModeResults.map(
                 (result) =>
                     result.coverageAt3
             )
@@ -360,15 +438,20 @@ function summarizeMode(
         inDomainCases: inDomainCases.length,
         outOfDomainCases:
             outOfDomainCases.length,
-        top1Accuracy,
-        top3Accuracy,
-        meanReciprocalRank,
+
+        strictTop1Accuracy,
+        primaryTop3Accuracy,
+        top3RelevantAccuracy,
+
+        meanPrimaryReciprocalRank,
         averageCoverageAt3,
         rejectionAccuracy,
+
         passedCases:
             allModeResults.filter(
                 (result) => result.passed
             ).length,
+
         totalCases: caseResults.length,
     };
 }
@@ -394,38 +477,49 @@ function printEvaluationReport(
     processingTimeMs: number
 ): void {
     console.group(
-        "Sprint 25 — Retrieval Evaluation"
+        "Sprint 25.1 — Strict Retrieval Evaluation"
     );
 
     console.table(
         cases.map((result) => ({
             test: result.id,
-            expected:
+
+            primary:
                 result.expectNoResults
                     ? "NO RESULTS"
-                    : result.expectedTitles.join(
-                          " | "
-                      ),
+                    : result.primaryExpectedTitle,
 
-            keywordTop3:
-                result.keyword.resultTitles
-                    .slice(0, 3)
-                    .join(" | "),
-            keywordPass:
+            keywordTop1:
+                result.keyword.resultTitles[0] ??
+                "NO RESULT",
+
+            keywordPrimaryRank:
+                result.keyword.primaryRank ??
+                "-",
+
+            keywordStrictPass:
                 result.keyword.passed,
 
-            vectorTop3:
-                result.vector.resultTitles
-                    .slice(0, 3)
-                    .join(" | "),
-            vectorPass:
+            vectorTop1:
+                result.vector.resultTitles[0] ??
+                "NO RESULT",
+
+            vectorPrimaryRank:
+                result.vector.primaryRank ??
+                "-",
+
+            vectorStrictPass:
                 result.vector.passed,
 
-            hybridTop3:
-                result.hybrid.resultTitles
-                    .slice(0, 3)
-                    .join(" | "),
-            hybridPass:
+            hybridTop1:
+                result.hybrid.resultTitles[0] ??
+                "NO RESULT",
+
+            hybridPrimaryRank:
+                result.hybrid.primaryRank ??
+                "-",
+
+            hybridStrictPass:
                 result.hybrid.passed,
         }))
     );
@@ -433,27 +527,38 @@ function printEvaluationReport(
     console.table(
         summaries.map((summary) => ({
             mode: summary.mode,
-            top1Accuracy:
+
+            strictTop1:
                 formatPercentage(
-                    summary.top1Accuracy
+                    summary.strictTop1Accuracy
                 ),
-            top3Accuracy:
+
+            primaryTop3:
                 formatPercentage(
-                    summary.top3Accuracy
+                    summary.primaryTop3Accuracy
                 ),
-            MRR:
-                summary.meanReciprocalRank.toFixed(
-                    3
+
+            anyRelevantTop3:
+                formatPercentage(
+                    summary.top3RelevantAccuracy
                 ),
+
+            primaryMRR:
+                summary
+                    .meanPrimaryReciprocalRank
+                    .toFixed(3),
+
             coverageAt3:
                 formatPercentage(
                     summary.averageCoverageAt3
                 ),
-            rejectionAccuracy:
+
+            rejection:
                 formatPercentage(
                     summary.rejectionAccuracy
                 ),
-            passed:
+
+            strictPass:
                 `${summary.passedCases}/${summary.totalCases}`,
         }))
     );

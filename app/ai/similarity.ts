@@ -1,4 +1,5 @@
 import type { PortfolioDocument } from "./documents";
+import {COMPANY_KEYS,detectCompanyKey,normalizeForMatching,} from "./companyMetadata";
 
 const COMPANIES = [
     "citi",
@@ -120,16 +121,14 @@ export function calculateSimilarity(
     /*
      * Detect whether the question requests a company.
      */
-    const requestedCompany = COMPANIES.find((company) =>
-        normalizedQuestion.includes(company)
-    );
+    const requestedCompany =  detectCompanyKey(normalizedQuestion);
 
     if (requestedCompany) {
         const matchesRequestedCompany =
             searchableDocument.includes(requestedCompany);
 
         const containsDifferentCompany =
-            COMPANIES.some(
+            COMPANY_KEYS.some(
                 (company) =>
                     company !== requestedCompany &&
                     searchableDocument.includes(company)

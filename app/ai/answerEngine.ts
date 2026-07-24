@@ -1,18 +1,15 @@
 import type { PortfolioDocument } from "./documents";
+import {
+    COMPANY_KEYS,
+    detectCompanyLabel,
+    normalizeForMatching,
+} from "./companyMetadata";
 
 const MAX_DOCUMENTS_IN_ANSWER = 3;
 const MAX_TOPICS = 8;
 const MAX_CONTEXT_TOPICS = 4;
 
-const COMPANY_LABELS: Record<string, string> = {
-    citi: "Citi",
-    deloitte: "Deloitte",
-    verizon: "Verizon",
-    "florida dep": "Florida DEP",
-    "ohio dfs": "Ohio DFS",
-    "washington dshs": "Washington DSHS",
-    "illinois dhs": "Illinois DHS",
-};
+
 
 const GENERIC_TOPICS = new Set([
     "project",
@@ -22,6 +19,12 @@ const GENERIC_TOPICS = new Set([
     "skills",
     "experience",
     "about mahesh",
+    "mahesh",
+    "about",
+    "summary",
+    "career",
+    "enterprise",
+    "banking",
 ]);
 
 export function generateAIResponse(
@@ -180,15 +183,7 @@ function buildDirectAnswer(
 function detectRequestedCompany(
     question: string
 ): string | undefined {
-    const normalizedQuestion = question.toLowerCase();
-
-    const companyEntry = Object.entries(
-        COMPANY_LABELS
-    ).find(([companyKey]) =>
-        normalizedQuestion.includes(companyKey)
-    );
-
-    return companyEntry?.[1];
+    return detectCompanyLabel(question);
 }
 
 /*
@@ -199,9 +194,8 @@ function detectRequestedTopic(
     question: string,
     documents: PortfolioDocument[]
 ): string | undefined {
-    const normalizedQuestion = question.toLowerCase();
-
-    const companyKeys = Object.keys(COMPANY_LABELS);
+    const normalizedQuestion =
+        normalizeForMatching(question);
 
     const candidates = Array.from(
         new Map(
@@ -214,27 +208,41 @@ function detectRequestedTopic(
                 .filter(Boolean)
                 .filter((topic) => {
                     const normalizedTopic =
-                        topic.toLowerCase();
+                        normalizeForMatching(topic);
 
                     const isGeneric =
-                        GENERIC_TOPICS.has(normalizedTopic);
-
-                    const isCompanyTopic =
-                        companyKeys.some((company) =>
-                            normalizedTopic.includes(company)
+                        GENERIC_TOPICS.has(
+                            normalizedTopic
                         );
 
-                    return !isGeneric && !isCompanyTopic;
+                    const isCompanyTopic =
+                        COMPANY_KEYS.some((company) =>
+                            normalizedTopic.includes(
+                                company
+                            )
+                        );
+
+                    return (
+                        !isGeneric &&
+                        !isCompanyTopic
+                    );
                 })
                 .map((topic) => [
-                    topic.toLowerCase(),
+                    normalizeForMatching(topic),
                     topic,
                 ])
         ).values()
-    ).sort((a, b) => b.length - a.length);
+    ).sort(
+        (a, b) =>
+            normalizeForMatching(b).length -
+            normalizeForMatching(a).length
+    );
 
-    const matchedTopic = candidates.find((topic) =>
-        normalizedQuestion.includes(topic.toLowerCase())
+    const matchedTopic = candidates.find(
+        (topic) =>
+            normalizedQuestion.includes(
+                normalizeForMatching(topic)
+            )
     );
 
     return matchedTopic
@@ -250,19 +258,20 @@ function getContextTopics(
     requestedCompany?: string,
     requestedTopic?: string
 ): string[] {
-    const companyKeys = Object.keys(COMPANY_LABELS);
+    const normalizedCompany = requestedCompany
+        ? normalizeForMatching(requestedCompany)
+        : undefined;
 
-    const normalizedCompany =
-        requestedCompany?.toLowerCase();
-
-    const normalizedRequestedTopic =
-        requestedTopic?.toLowerCase();
+    const normalizedRequestedTopic = requestedTopic
+        ? normalizeForMatching(requestedTopic)
+        : undefined;
 
     const topicMap = new Map<string, string>();
 
     document.tags.forEach((tag) => {
         const cleanedTag = tag.trim();
-        const normalizedTag = cleanedTag.toLowerCase();
+        const normalizedTag =
+            normalizeForMatching(cleanedTag);
 
         if (!cleanedTag) {
             return;
@@ -272,6 +281,7 @@ function getContextTopics(
             return;
         }
 
+        // Do not repeat the requested company.
         if (
             normalizedCompany &&
             normalizedTag === normalizedCompany
@@ -279,6 +289,7 @@ function getContextTopics(
             return;
         }
 
+        // Do not repeat the requested technology/topic.
         if (
             normalizedRequestedTopic &&
             normalizedTag === normalizedRequestedTopic
@@ -286,9 +297,12 @@ function getContextTopics(
             return;
         }
 
+        // Exclude other standalone company names.
         if (
-            companyKeys.some(
-                (company) => normalizedTag === company
+            COMPANY_KEYS.some(
+                (companyKey) =>
+                    normalizedTag ===
+                    normalizeForMatching(companyKey)
             )
         ) {
             return;

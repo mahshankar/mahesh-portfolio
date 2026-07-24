@@ -13,6 +13,7 @@ import {
 } from "../../ai/embeddingModel";
 import { calculateCosineSimilarity } from "../../ai/cosineSimilarity";
 import { vectorSearchWithScores } from "../../ai/vectorSearch";
+import {hybridSearchWithScores} from "../../ai/hybridSearch";
 
 const INITIAL_REPLY = `👋 Welcome!
 
@@ -49,17 +50,14 @@ const AIAssistant = () => {
          setLastQuestion(trimmedQuestion);
 
         try {
-            const vectorResults =
-                await vectorSearchWithScores(trimmedQuestion);
-
-            console.log(
-                "Vector search matches:",
-                vectorResults.map(({ document, score }) => ({
-                    title: document.title,
-                    score,
-                }))
-            );
-            const matchedDocuments = semanticSearch(trimmedQuestion);
+            const hybridResults =
+                await hybridSearchWithScores(
+                    trimmedQuestion
+                );
+              const matchedDocuments =
+                    hybridResults.map(
+                        ({ document }) => document
+                    );
 
             const generatedResponse = generateAIResponse(
                 trimmedQuestion,

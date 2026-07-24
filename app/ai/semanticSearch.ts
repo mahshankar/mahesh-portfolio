@@ -1,27 +1,71 @@
-import {documents, PortfolioDocument} from './documents';
-import {calculateSimilarity} from './similarity';
+import {
+    documents,
+    type PortfolioDocument,
+} from "./documents";
 
-export function semanticSearch(question: string): PortfolioDocument[] {
-    const MINIMUM_SCORE = 20;
-    const MAX_RESULTS = 5;
+import { calculateSimilarity } from "./similarity";
+
+export const DEFAULT_MIN_KEYWORD_SCORE = 20;
+export const DEFAULT_MAX_KEYWORD_RESULTS = 5;
+
+export type KeywordSearchResult = {
+    document: PortfolioDocument;
+    score: number;
+};
+
+export type KeywordSearchOptions = {
+    minScore?: number;
+    maxResults?: number;
+};
+
+export function keywordSearchWithScores(
+    question: string,
+    options: KeywordSearchOptions = {}
+): KeywordSearchResult[] {
+    const normalizedQuestion = question.trim();
+
+    if (!normalizedQuestion) {
+        return [];
+    }
+
+    const minScore =
+        options.minScore ??
+        DEFAULT_MIN_KEYWORD_SCORE;
+
+    const maxResults =
+        options.maxResults ??
+        DEFAULT_MAX_KEYWORD_RESULTS;
 
     const rankedDocuments = documents
-            .map(doc => ({
-                document: doc,
-                score: calculateSimilarity(question, doc)
-            }))
-            .sort((a, b) => b.score - a.score);
+        .map((document) => ({
+            document,
+            score: calculateSimilarity(
+                normalizedQuestion,
+                document
+            ),
+        }))
+        .sort((a, b) => b.score - a.score);
 
-/* console.log(
-    rankedDocuments.map(item => ({
-        title: item.document.title,
-        score: item.score
-    }))
-); */
+    console.table(
+        rankedDocuments.map(({ document, score }) => ({
+            title: document.title,
+            keywordScore: score,
+        }))
+    );
 
-        return rankedDocuments
-            .filter(item => item.score >= MINIMUM_SCORE)
-            .slice(0, MAX_RESULTS)
-            .map(item => item.document);
+    return rankedDocuments
+        .filter(({ score }) => score >= minScore)
+        .slice(0, maxResults);
+}
 
+/*
+ * Preserve the existing function so older code
+ * can continue retrieving documents without scores.
+ */
+export function semanticSearch(
+    question: string
+): PortfolioDocument[] {
+    return keywordSearchWithScores(question).map(
+        ({ document }) => document
+    );
 }

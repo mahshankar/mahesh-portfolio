@@ -10,16 +10,24 @@ import {
     calculateCosineSimilarity,
 } from "./cosineSimilarity";
 
-const MIN_VECTOR_SIMILARITY = 0.3;
-const MAX_VECTOR_RESULTS = 5;
+import {buildEmbeddingQuery} from "./queryPreprocessor";
+
+export const DEFAULT_MIN_VECTOR_SIMILARITY = 0.3;
+export const DEFAULT_MAX_VECTOR_RESULTS = 5;
 
 export type VectorSearchResult = {
     document: PortfolioDocument;
     score: number;
 };
 
+export type VectorSearchOptions = {
+    minSimilarity?: number;
+    maxResults?: number;
+};
+
 export async function vectorSearchWithScores(
-    question: string
+    question: string,
+    options: VectorSearchOptions = {}
 ): Promise<VectorSearchResult[]> {
     const normalizedQuestion = question.trim();
 
@@ -27,8 +35,24 @@ export async function vectorSearchWithScores(
         return [];
     }
 
-    const questionEmbedding =
-        await generateEmbedding(normalizedQuestion);
+    const minSimilarity =
+        options.minSimilarity ??
+        DEFAULT_MIN_VECTOR_SIMILARITY;
+
+    const maxResults =
+        options.maxResults ??
+        DEFAULT_MAX_VECTOR_RESULTS;
+
+  const embeddingQuery =
+      buildEmbeddingQuery(normalizedQuestion);
+
+  console.log(
+      "Embedding query:",
+      embeddingQuery
+  );
+
+  const questionEmbedding =
+      await generateEmbedding(embeddingQuery);
 
     const embeddedDocuments =
         await getDocumentEmbeddings();
@@ -43,19 +67,21 @@ export async function vectorSearchWithScores(
         }))
         .sort((a, b) => b.score - a.score);
 
-    console.table(
-        rankedDocuments.map(({ document, score }) => ({
-            title: document.title,
-            score: Number(score.toFixed(4)),
-        }))
-    );
 
+        if (process.env.NODE_ENV === "development") {
+            console.table(
+                rankedDocuments.map(({ document, score }) => ({
+                    title: document.title,
+                    vectorScore: Number(score.toFixed(4)),
+                }))
+            );
+        }
     return rankedDocuments
         .filter(
             ({ score }) =>
-                score >= MIN_VECTOR_SIMILARITY
+                score >= minSimilarity
         )
-        .slice(0, MAX_VECTOR_RESULTS);
+        .slice(0, maxResults);
 }
 
 export async function vectorSearch(
@@ -64,7 +90,5 @@ export async function vectorSearch(
     const results =
         await vectorSearchWithScores(question);
 
-    return results.map(
-        ({ document }) => document
-    );
+    return results.map(({ document }) => document);
 }

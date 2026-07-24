@@ -165,7 +165,7 @@ const AIAssistant = () => {
                     </h3>
 
                     <p className="text-sm text-slate-400">
-                        No API • No LLM • Local Knowledge Base
+                        Powered by local embeddings and hybrid retrieval
                     </p>
 
                 </div>
